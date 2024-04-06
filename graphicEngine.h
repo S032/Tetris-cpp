@@ -14,13 +14,21 @@ private:
     int winWidth;
     int winHeight;
     int multiplier;
+    const float divider = 1.5;
     sf::RenderWindow *window;
+    sf::Font font;
+    sf::Text textScore;
 public:
     GraphicEngine(int FieldHeight, int FieldWidth, int newSizeMultiplier, std::string winName);
+    ~GraphicEngine();
     void pollEvent();
-    void drawFrame(field_t field);
+    void drawFrame(field_t field, field_t nextFigure, int score);
+    void drawNextFigure(field_t nextFigure);
     bool windowIsOpen();
+    void closeWindow();
 private:
+    void set_text();
+    void drawText(int score);
     void drawField(field_t field);
 };
 

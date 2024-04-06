@@ -1,19 +1,12 @@
 #ifndef FIGURE_H
 #define FIGURE_H
 
+#include "graphicEngine.h"
 #include <vector>
 #include <iostream>
 
-#define LEFT 0
+#define LEFT -1
 #define RIGHT 1
-#define I 0
-#define J 1
-#define L 2
-#define O 3
-#define Z 4
-#define T 5
-#define S 6
-
 
 struct pos_t {
     int x;
@@ -27,8 +20,8 @@ using Figures = std::vector<figure_t>;
 const Figures tetrominoes = {
     // I figure
     {
-        {{-1, 0}, {0, 0}, {1, 0}, {2, 0}},
-        {{0, -1}, {0, 0}, {0, 1}, {0, 2}}
+        {{0, 0}, {1, 0}, {2, 0}, {3, 0}},
+        {{0, 0}, {0, 1}, {0, 2}, {0, 3}}
     },
     // J figure
     {
@@ -37,17 +30,49 @@ const Figures tetrominoes = {
         {{0, 1}, {1, 1}, {2, 1}, {2, 2}},
         {{1, 0}, {1, 1}, {1, 2}, {0, 2}},
     },
+    // L figure
+    {
+        {{0, 1}, {1, 1}, {2, 1}, {2, 0}},
+        {{1, 0}, {1, 1}, {1, 2}, {2, 2}},
+        {{0, 1}, {1, 1}, {2, 1}, {0, 2}},
+        {{0, 0}, {1, 0}, {1, 1}, {1, 2}},
+    },
+    // O ligure
+    {
+        {{0, 0}, {0, 1}, {1, 0}, {1, 1}},
+    },
+    // Z Figure
+    {
+        {{0, 0}, {1, 0}, {1, 1}, {2, 1}},
+        {{1, 0}, {1, 1}, {0, 1}, {0, 2}},
+    },
+    // T figure
+    {
+        {{1, 0}, {0, 1}, {1, 1}, {2, 1}},
+        {{1, 0}, {1, 1}, {2, 1}, {1, 2}},
+        {{0, 1}, {1, 1}, {2, 1}, {1, 2}},
+        {{1, 0}, {1, 1}, {1, 2}, {0, 1}},
+    },
+    // S Figure
+    {
+        {{1, 0}, {2, 0}, {0, 1}, {1, 1}},
+        {{1, 0}, {1, 1}, {2, 1}, {2, 2}},
+    },
 }; //zzzzz
 
 class Figure {
 private:
+    field_t *gameField;
     figure_t coords;
     pos_t pos;
     int turnPos = 0;
 public:
-    Figure(int figureType, pos_t startPos);
+    Figure(int figureType, pos_t startPos, field_t *field);
     coordinates_t getFigureCoord();
-    void downFigure();
+    coordinates_t getNextFigureCoord(int nextFigure);
+    bool downFigure();
+    void instantDownFigure();
+    void moveFigure(int direction);
     void turnFigure();
 };
 

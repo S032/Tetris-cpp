@@ -1,13 +1,10 @@
 #include "figure.h"
-Figure::Figure(int figureType, pos_t startPos)
+Figure::Figure(int figureType, pos_t startPos, field_t *field)
     :
+    gameField(field),
     coords(tetrominoes[figureType]),
     pos(startPos)
-{
-    for (size_t i = 0; i != coords[0].size(); i++) {
-        printf("x(%d);y(%d)\n", coords[0][i].x, coords[0][i].y);
-    }
-}
+{}
 
 coordinates_t Figure::getFigureCoord() {
     coordinates_t projCoord;
@@ -18,11 +15,46 @@ coordinates_t Figure::getFigureCoord() {
     return projCoord;
 }
 
-void Figure::downFigure() {
+coordinates_t Figure::getNextFigureCoord(int nextFigure) {
+    figure_t nextFig = tetrominoes[nextFigure];
+    return nextFig[0];
+}
+
+bool Figure::downFigure() {
+    coordinates_t projCoord = getFigureCoord();
+    for (size_t i = 0; i != projCoord.size(); i++) {
+        if ((*gameField)[projCoord[i].y + 1][projCoord[i].x] == 1) {
+            return false;
+        }
+    }
     pos.y++;
+    return true;
+}
+
+void Figure::instantDownFigure() {
+    while(downFigure()); 
+}
+
+void Figure::moveFigure(int direction) {
+    coordinates_t projCoord = getFigureCoord();
+    for (size_t i = 0; i != projCoord.size(); i++) {
+        if ((*gameField)[projCoord[i].y][projCoord[i].x + direction] == 1) {
+            return;
+        }
+    }
+    pos.x += direction;
+    return;
 }
 
 void Figure::turnFigure() {
+    int previousTurn = turnPos;
     turnPos += 1;
     turnPos %= coords.size();
+    coordinates_t projCoord = getFigureCoord();
+    for (size_t i = 0; i != projCoord.size(); i++) {
+        if ((*gameField)[projCoord[i].y][projCoord[i].x] == 1) {
+            turnPos = previousTurn;
+            return;
+        }
+    }
 }
