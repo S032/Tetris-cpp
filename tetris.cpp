@@ -232,6 +232,7 @@ int TetrisGame::wrHighestScore() {
     }
     std::string line;
     std::getline(scoreFile, line);
+    scoreFile.close();
     return std::stoi(line);
 }
 
@@ -242,4 +243,5 @@ void TetrisGame::wrHighestScore(int highscore) {
         exit(EXIT_FAILURE);
     }
     scoreFile << highscore;
+    scoreFile.close();
 }
