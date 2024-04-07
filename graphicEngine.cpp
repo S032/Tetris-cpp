@@ -23,14 +23,21 @@ void GraphicEngine::set_text() {
 	textScore.setFont(font);
 	textScore.setCharacterSize(multiplier / divider);
 	textScore.setFillColor(sf::Color::White);
-
 	textScore.setPosition(winWidth, (multiplier / divider + 2) + multiplier * 2 + 2);
+	
+	textHighScore.setFont(font);
+	textHighScore.setCharacterSize(multiplier / divider);
+	textHighScore.setFillColor(sf::Color::White);
+	textHighScore.setPosition(winWidth, (multiplier / divider + 2) + multiplier * 3 + 2);
 }
 
-void GraphicEngine::drawText(int score) {
+void GraphicEngine::drawText(int score, int highscore) {
 	std::string text = "score: " + std::to_string(score);
 	textScore.setString(text);
+	text = "record: " + std::to_string(highscore);
+	textHighScore.setString(text);
 	window->draw(textScore);
+	window->draw(textHighScore);
 }
 
 void GraphicEngine::drawField(field_t field) {
@@ -72,11 +79,11 @@ void GraphicEngine::pollEvent() {
     }
 }
 
-void GraphicEngine::drawFrame(field_t field, field_t nextFigure, int score) {
+void GraphicEngine::drawFrame(field_t field, field_t nextFigure, int score, int highScore) {
 		window->clear();
 		drawField(field);
 		drawNextFigure(nextFigure);
-		drawText(score);
+		drawText(score, highScore);
         window->display();
 }
 

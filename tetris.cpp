@@ -27,16 +27,20 @@ int TetrisGame::getRandFigure() {
 void TetrisGame::startGame() {
     spawnFigure(nextFigure, {(fieldWidth - 2) / 2, 1});
     makeFence();
+    highscore = wrHighestScore();
     while(graphicEngine->windowIsOpen()) {
         graphicEngine->pollEvent();
         drawFigure();
         drawNextFigure();
-        graphicEngine->drawFrame(gameField, nextFigureField, score);
+        graphicEngine->drawFrame(gameField, nextFigureField, score, highscore);
         cleanFigure();
         cleanNextFigure();
         movement();
         if (gameOver) break;
         tickHandler();
+    }
+    if (score > highscore) {
+        wrHighestScore(score);
     }
 }
 
@@ -218,4 +222,24 @@ void TetrisGame::tickHandler() {
         moveTimeTick+=1;
         moveTimeTick%=11;
     }
+}
+
+int TetrisGame::wrHighestScore() {
+    std::ifstream scoreFile("resources/hightscore.txt");
+    if (!scoreFile.is_open()) {
+        printf("couldn't open hightscore.txt");
+        exit(EXIT_FAILURE);
+    }
+    std::string line;
+    std::getline(scoreFile, line);
+    return std::stoi(line);
+}
+
+void TetrisGame::wrHighestScore(int highscore) {
+    std::ofstream scoreFile("resources/hightscore.txt", std::ios::trunc);
+    if (!scoreFile.is_open()) {
+        printf("couldn't open hightscore.txt");
+        exit(EXIT_FAILURE);
+    }
+    scoreFile << highscore;
 }
