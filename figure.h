@@ -62,12 +62,12 @@ const Figures tetrominoes = {
 
 class Figure {
 private:
-    field_t *gameField;
+    field_t &gameField;
     figure_t coords;
     pos_t pos;
     int turnPos = 0;
 public:
-    Figure(int figureType, pos_t startPos, field_t *field);
+    Figure(int figureType, pos_t startPos, field_t &field);
     coordinates_t getFigureCoord();
     coordinates_t getNextFigureCoord(int nextFigure);
     bool downFigure();

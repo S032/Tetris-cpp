@@ -41,8 +41,8 @@ void GraphicEngine::drawText(int score, int highscore) {
 }
 
 void GraphicEngine::drawField(field_t field) {
-	for (size_t y = 1; y + 1 != field.size(); ++y) {
-		for (size_t x = 1; x + 1 != field[y].size(); ++x) {
+	for (std::size_t y = 1; y + 1 != field.size(); ++y) {
+		for (std::size_t x = 1; x + 1 != field[y].size(); ++x) {
 			sf::RectangleShape square(sf::Vector2f(multiplier, multiplier));
 			square.setPosition(x * (multiplier + 2), y * (multiplier + 2));
 			square.setOutlineThickness(2.0f);
@@ -55,9 +55,9 @@ void GraphicEngine::drawField(field_t field) {
 }
 
 void GraphicEngine::drawNextFigure(field_t field) {
-	size_t spacout = winWidth;
-	for (size_t y = 0; y != field.size(); ++y) {
-		for (size_t x = 0; x != field[y].size(); ++x) {
+	std::size_t spacout = winWidth;
+	for (std::size_t y = 0; y != field.size(); ++y) {
+		for (std::size_t x = 0; x != field[y].size(); ++x) {
 			sf::RectangleShape square(sf::Vector2f(multiplier / divider, multiplier / divider));
 			square.setPosition(x * (multiplier / divider + 2) + spacout
 								, y * (multiplier / divider + 2) + multiplier + 2);

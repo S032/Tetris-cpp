@@ -15,8 +15,8 @@ class TetrisGame {
 private:
     int fieldHeight;
     int fieldWidth;
-    int sizeMultiplier;
-    int nextFigure;
+    const int sizeMultiplier;
+    int nextFigureId;
     int score = 0;
     int highscore = 0;
     const int point = 100;
@@ -40,10 +40,10 @@ private:
     void drawFigure();
     void drawNextFigure();
     void cleanNextFigure();
-    void cleanFigure();
-    std::map<size_t, int> getRowsSums();
+    void cleanFigure(coordinates_t figure, field_t &field);
+    std::map<std::size_t, int> getRowsSums();
     void findFullRows();
-    void sealField(std::map<size_t, int> sumMap);
+    void sealField(std::map<std::size_t, int> sumMap);
     void movement();
     void tickHandler();
     void wrHighestScore(int score);

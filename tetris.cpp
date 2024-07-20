@@ -10,7 +10,7 @@ TetrisGame::TetrisGame(int newFieldHeight, int newFieldWidth, int newSizeMultipl
     nextFigureField.resize(2, std::vector<int>(4, 0));
     graphicEngine = new GraphicEngine(fieldHeight, fieldWidth, sizeMultiplier, "Tetris");
     currentFigure = nullptr;
-    nextFigure = getRandFigure();
+    nextFigureId = getRandFigure();
 }
 
 TetrisGame::~TetrisGame()
@@ -25,7 +25,7 @@ int TetrisGame::getRandFigure() {
 }
 
 void TetrisGame::startGame() {
-    spawnFigure(nextFigure, {(fieldWidth - 2) / 2, 1});
+    spawnFigure(nextFigureId, {(fieldWidth - 2) / 2, 1});
     makeFence();
     highscore = wrHighestScore();
     while(graphicEngine->windowIsOpen()) {
@@ -33,8 +33,9 @@ void TetrisGame::startGame() {
         drawFigure();
         drawNextFigure();
         graphicEngine->drawFrame(gameField, nextFigureField, score, highscore);
-        cleanFigure();
-        cleanNextFigure();
+        cleanFigure(currentFigure->getFigureCoord(), gameField);
+        cleanFigure(currentFigure->getNextFigureCoord(nextFigureId), nextFigureField);
+        //cleanNextFigure();
         movement();
         if (gameOver) break;
         tickHandler();
@@ -45,8 +46,8 @@ void TetrisGame::startGame() {
 }
 
 void TetrisGame::makeFence() {
-    for (size_t i = 1; i != gameField.size(); i++) {
-        for (size_t j = 0; j != gameField[i].size(); j++) {
+    for (std::size_t i = 1; i != gameField.size(); i++) {
+        for (std::size_t j = 0; j != gameField[i].size(); j++) {
             if((j == 0 || j + 1 == gameField[i].size()) || (i + 1 == gameField.size())) {
                 gameField[i][j] = 1;
             }
@@ -56,8 +57,8 @@ void TetrisGame::makeFence() {
 
 void TetrisGame::printField() {
     printf("----------------------------------------------------------------------\n");
-    for (size_t i = 0; i != gameField.size(); i++) {
-        for (size_t j = 0; j != gameField[i].size(); j++) {
+    for (std::size_t i = 0; i != gameField.size(); i++) {
+        for (std::size_t j = 0; j != gameField[i].size(); j++) {
             printf("[%d]", gameField[i][j]);
         }
         printf("\n");
@@ -71,13 +72,13 @@ void TetrisGame::spawnFigure(int figureType, pos_t startPos) {
         findFullRows();
     }
     delete currentFigure;
-    currentFigure = new Figure(figureType, startPos, &gameField);
-    nextFigure = getRandFigure();
+    currentFigure = new Figure(figureType, startPos, gameField);
+    nextFigureId = getRandFigure();
 }
 
 void TetrisGame::drawFigure() {
     coordinates_t figure = currentFigure->getFigureCoord();
-    for (size_t i = 0; i != figure.size(); i++) {
+    for (std::size_t i = 0; i != figure.size(); i++) {
         if (gameField[figure[i].y][figure[i].x] == 1) {
             gameOver = true;
             return;
@@ -87,32 +88,23 @@ void TetrisGame::drawFigure() {
 }
 
 void TetrisGame::drawNextFigure() {
-    coordinates_t figure = currentFigure->getNextFigureCoord(nextFigure);
-    for (size_t i = 0; i != figure.size(); i++) {
+    coordinates_t figure = currentFigure->getNextFigureCoord(nextFigureId);
+    for (std::size_t i = 0; i != figure.size(); i++) {
         nextFigureField[figure[i].y][figure[i].x] = 1;
     }
 }
 
-void TetrisGame::cleanNextFigure() {
-    coordinates_t figure = currentFigure->getNextFigureCoord(nextFigure);
-    for (size_t i = 0; i != figure.size(); i++) {
-        nextFigureField[figure[i].y][figure[i].x] = 0;
+void TetrisGame::cleanFigure(coordinates_t figure, field_t &field) {
+    for (std::size_t i = 0; i != figure.size(); i++) {
+        field[figure[i].y][figure[i].x] = 0;
     }
 }
 
-void TetrisGame::cleanFigure() {
-        coordinates_t figure = currentFigure->getFigureCoord();
-
-    for (size_t i = 0; i != figure.size(); i++) {
-        gameField[figure[i].y][figure[i].x] = 0;
-    }
-}
-
-std::map<size_t, int> TetrisGame::getRowsSums() {
-    std::map<size_t, int> map;
-    for (size_t i = 1; i + 1 != gameField.size(); ++i) {
+std::map<std::size_t, int> TetrisGame::getRowsSums() {
+    std::map<std::size_t, int> map;
+    for (std::size_t i = 1; i + 1 != gameField.size(); ++i) {
         int sum = 0;
-		for (size_t j = 1; j + 1 != gameField[i].size(); ++j)
+		for (std::size_t j = 1; j + 1 != gameField[i].size(); ++j)
             sum += gameField[i][j];
         map.insert({i, sum});
 	}
@@ -123,12 +115,12 @@ void TetrisGame::findFullRows() {
     int fullRowscount = 0;
     bool needToSeal = false;
     std::vector<int> combos;
-    std::map<size_t, int> sumMap = getRowsSums();
-    for (size_t i = 1; i + 1 != gameField.size(); ++i) {
+    std::map<std::size_t, int> sumMap = getRowsSums();
+    for (std::size_t i = 1; i + 1 != gameField.size(); ++i) {
         if (sumMap[i] == fieldWidth - 2) {
             needToSeal = true;
             fullRowscount++;
-            for (size_t j = 1; j + 1 != gameField[i].size(); ++j)
+            for (std::size_t j = 1; j + 1 != gameField[i].size(); ++j)
                 gameField[i][j] = 0;
             sumMap[i] = 0; 
         }
@@ -141,29 +133,15 @@ void TetrisGame::findFullRows() {
 	}
     combos.push_back(fullRowscount);
     for (int combo : combos) {
-        switch (combo)
-        {
-        case 0:
-            break;
-        case 1:
-            score += point;
-            break;
-        case 2:
-            score += point * 4;
-            break;
-        case 3:
-            score += point * 6;
-            break;
-        default:
-            score += point * 8;
-            break;
-        }
+        if (combo == 0)
+            continue;
+        score += point * (combo * combo);
     }
     if(needToSeal) sealField(sumMap);
 }
 
-void TetrisGame::sealField(std::map<size_t, int> sumMap) {
-    size_t i = 1;
+void TetrisGame::sealField(std::map<std::size_t, int> sumMap) {
+    std::size_t i = 1;
     while(i + 2 != gameField.size()) {
         if (sumMap[i] > 0) {
             if (sumMap[i + 1] == 0) {
@@ -211,7 +189,7 @@ void TetrisGame::movement() {
 
     if (timeTick == 20) {
         if (!currentFigure->downFigure())
-            spawnFigure(nextFigure, {(fieldWidth - 2) / 2, 1});
+            spawnFigure(nextFigureId, {(fieldWidth - 2) / 2, 1});
     }
 }
 
